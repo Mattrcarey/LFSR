@@ -1,24 +1,30 @@
 """
-This is a python script to take in a polynomial and a number and spit out a random number
+This is a python script to takes a Length, Seed, and Gates and uses those
+to implement an LFSR. Prints each step in binary and the length of the 
+repeating series. 
 """
 
+LENGTH = 10             # The number of bits in the seed
+SEED = 0b10000          # The seed value
+GATES = [0,2,3,5]       # The P gates for the LSFR
 
-#Main needs to take in the number of bits, the starting bits and a list of bits that will be xor'ed
 def main() : 
-    seed = 0b1001 # 0b means its a binary value 1111 makes it equal to 15
-    currentSeed = 0b0000
-    XORbits = [0,1,3]
-    currentSeed = seed
+    global LENGTH, SEED, GATES
+    print(("{:0"+str(LENGTH)+"b}").format(SEED))
+    currentSeed = SEED
+    savedStates = {SEED:1}
+    count = 0
     while(1) :
-        print("{:04b}".format(seed)) # :04b prints a 4bit value, this will need to be changed to be the number of bits
-        newbit = (currentSeed >> XORbits[0]) & 1
-        for i in XORbits :
-            newbit = newbit ^ ((seed >> i) & 1)
-        currentSeed = (currentSeed >> 1) | (newbit << 3)
-        print("{:04b}".format(currentSeed))
-        if(currentSeed == seed) :
+        newbit = (currentSeed >> GATES[0]) & 1
+        for i in GATES[1:] :
+            newbit = newbit ^ ((currentSeed >> i) & 1)
+        currentSeed = (currentSeed >> 1) | (newbit << (LENGTH-1))
+        print(("{:0"+str(LENGTH)+"b}").format(currentSeed))
+        if(currentSeed in savedStates.keys()) :
             break
-
+        savedStates[currentSeed] = 1
+        count+=1
+    print("The series repeats after", count, "rounds")
 
 
 if __name__ == "__main__":
